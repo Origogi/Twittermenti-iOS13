@@ -8,6 +8,7 @@
 
 import UIKit
 import SwifteriOS
+import SwiftyJSON
 
 class ViewController: UIViewController {
     
@@ -17,12 +18,30 @@ class ViewController: UIViewController {
     
     let swifter = Swifter(consumerKey: "FEAZwnygkUcFqppAG1oaTOk2J", consumerSecret: "4HQxlYjPcagwDHxrQ9hB7RTDmlawxPl03DpHQmZvWpxLYNZd3R")
 
+    
+    let sentimentClassifier = TweetSentimentClassifier()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        swifter.searchTweet(using: "@Apple", success: { (results, metadata) in
-            print(results)
+        let prediction = try! sentimentClassifier.prediction(text: "@Apple is terrible company!!")
+        
+        print(prediction.label)
+        
+        swifter.searchTweet(using: "@Apple", lang: "en", count: 100, tweetMode: .extended, success: { (results, metadata) in
+            
+            var tweets = [String]()
+            
+            
+            for i in 0..<100 {
+                if let tweet = results[i]["full_text"].string {
+                    tweets.append(tweet)
+                }
+            }
+            
+            print(tweets)
+
+            
         }) { (error) in
             print(error)
         }
